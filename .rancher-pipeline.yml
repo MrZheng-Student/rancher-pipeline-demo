@@ -1,0 +1,25 @@
+stages:
+  - name: bulid
+    steps:
+      - runScriptConfig:
+          image: maven:v1
+          shellScript: mvn clean package
+  - name: publish
+    steps:
+      - publishImageConfig:
+          dockerfilePath: ./Dockerfile
+          buildContext: .
+          tag: rancher-pipeline-demo:v1  #TODO:zkxy-config改为配置的镜像名称
+          pushRemote: true
+          registry: registry.yykfb.gzpi:5000 #Docker私仓地址
+        env:
+          PLUGIN_DEBUG: "true"
+          PLUGIN_INSECURE: "true"
+  - name: deploy
+    steps:
+      - applyYamlConfig:
+          path: ./deployment.yaml
+timeout: 60
+branch:
+  include:
+    - master
